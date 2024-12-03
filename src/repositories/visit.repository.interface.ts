@@ -2,7 +2,7 @@ import { GetVisitResponseDto, GetVisitRequestDto, BulkVisitRequestDto } from "sr
 
 export interface IVisitRepository {
     getVisits : (request:GetVisitRequestDto) => Promise<GetVisitResponseDto[]>;
-    bulkInsertVisits : (request:BulkVisitRequestDto) => Promise<void>;
+    bulkInsertVisits : (request:BulkVisitRequestDto) => Promise<any>;
 }
 
 export const IVisitRepository = Symbol('IVisitRepository');

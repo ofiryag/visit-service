@@ -11,7 +11,6 @@ export const extractOrganizationIdFromRequest = (req: HttpRequest)=>{
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
 
-    // Decode the JWT and extract 'custom:organization_id'
     const decodedToken = decodeJwt(token);
 
     if (isNil(decodedToken) || isNil(decodedToken[TOKEN_ORG_ID_KEY])) {

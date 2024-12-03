@@ -1,17 +1,9 @@
+import { z } from 'zod';
+import { bulkVisitRequestSchema, getVisitRequestSchema, postVisitRequestSchema } from './schemas';
 export type GetVisitResponseDto = {
     url: string;
-    visit_time: Date;
+    time: Date;
 };
-export type GetVisitRequestDto = {
-    organization_id: string;
-    offset?: number;
-    limit?: number;
-};
-export type PostVisitRequestDto = {
-    url: string;
-    visit_time: Date;
-};
-export type BulkVisitRequestDto = {
-    visits: PostVisitRequestDto[];
-    organization_id: string;
-};
+export type PostVisitRequestDto = z.infer<typeof postVisitRequestSchema>;
+export type BulkVisitRequestDto = z.infer<typeof bulkVisitRequestSchema>;
+export type GetVisitRequestDto = z.infer<typeof getVisitRequestSchema>;

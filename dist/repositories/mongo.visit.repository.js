@@ -21,30 +21,37 @@ let MongoVisitRepository = class MongoVisitRepository {
         this.dbRepository = dbRepository;
     }
     async getVisits(request) {
-        const dbClient = await this.dbRepository.connectToDatabase();
-        const orgDb = dbClient.db(`org_${request.organization_id}`);
-        console.log(orgDb.databaseName);
-        const visitsCollection = orgDb.collection(consts_1.MONGO.COLLECTIONS.VISITS);
-        console.log(visitsCollection.collectionName);
-        const documents = await visitsCollection.find({}).project({ "_id": 0 }).toArray();
-        console.log(documents);
-        return documents;
+        try {
+            const dbClient = await this.dbRepository.connectToDatabase();
+            const orgDb = dbClient.db(`org_${request.organization_id}`);
+            const visitsCollection = orgDb.collection(consts_1.MONGO.COLLECTIONS.VISITS);
+            const visitAggregation = [];
+            if (request.limit && request.offset)
+                visitAggregation.push(...buildPaginationStages(request));
+            visitAggregation.push({
+                $project: {
+                    _id: 0
+                }
+            });
+            const documents = await visitsCollection.aggregate(visitAggregation).toArray();
+            return documents;
+        }
+        catch (error) {
+            console.log(`failed to get visits from mongoDB for organization_id ${request.organization_id}, error: ${error}`);
+            throw new common_1.HttpException(`failed to get visits for organization_id ${request.organization_id}`, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
     async bulkInsertVisits(request) {
         try {
             const dbClient = await this.dbRepository.connectToDatabase();
             const orgDb = dbClient.db(`org_${request.organization_id}`);
-            console.log(orgDb.databaseName);
             const visitsCollection = orgDb.collection(consts_1.MONGO.COLLECTIONS.VISITS);
-            visitsCollection.collectionName;
-            console.log(visitsCollection.collectionName);
-            console.log(request.visits);
-            const documents = await visitsCollection.insertMany(request.visits);
-            console.log(documents);
-            return;
+            const result = await visitsCollection.insertMany(request.visits);
+            return result;
         }
         catch (error) {
-            console.log(error);
+            console.log(`failed to insert visits to mongoDB for organization_id ${request.organization_id}, error: ${error}`);
+            throw new common_1.HttpException(`failed to insert visits for organization_id ${request.organization_id}`, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 };
@@ -54,4 +61,14 @@ exports.MongoVisitRepository = MongoVisitRepository = __decorate([
     __param(0, (0, common_1.Inject)(db_repository_interface_1.IDbRepository)),
     __metadata("design:paramtypes", [Object])
 ], MongoVisitRepository);
+const buildPaginationStages = (request) => {
+    return [
+        {
+            $skip: (request.limit * request.offset)
+        },
+        {
+            $limit: request.limit
+        }
+    ];
+};
 //# sourceMappingURL=mongo.visit.repository.js.map

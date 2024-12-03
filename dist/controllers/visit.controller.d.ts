@@ -4,5 +4,5 @@ export declare class VisitController {
     private readonly visitService;
     constructor(visitService: IVisitService);
     getVisits(req: HttpRequest): Promise<import("src/contracts/dtos").GetVisitResponseDto[]>;
-    bulkInsertVisits(req: HttpRequest): Promise<void>;
+    bulkInsertVisits(req: HttpRequest): Promise<any>;
 }

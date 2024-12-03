@@ -21,19 +21,28 @@ let VisitService = class VisitService {
         this.visitRepository = visitRepository;
     }
     async getVisits(request) {
-        console.log(`trying to get visits for organization id ${request.organization_id}`);
-        const visits = await this.visitRepository.getVisits(request);
-        if (visits.length === 0 || (0, lodash_1.isNil)(visits)) {
-            console.log("could not find visits");
+        try {
+            console.log(`trying to get visits for organization id ${request.organization_id}`);
+            const visits = await this.visitRepository.getVisits(request);
+            if (visits.length === 0 || (0, lodash_1.isNil)(visits)) {
+                console.log("could not find visits");
+                return visits;
+            }
+            console.log(`successfully got visits for organization id ${request.organization_id}`);
             return visits;
         }
-        console.log(`successfully got visits for organization id ${request.organization_id}`);
-        return visits;
+        catch (error) {
+        }
     }
     async bulkInsertVisits(request) {
-        console.log(`trying to insert visits for organization id ${request.organization_id}`);
-        const visits = await this.visitRepository.bulkInsertVisits(request);
-        return;
+        try {
+            console.log(`trying to insert visits for organization id ${request.organization_id}`);
+            const result = await this.visitRepository.bulkInsertVisits(request);
+            console.log(`successfully inserted visits for organization id ${request.organization_id}`);
+            return result;
+        }
+        catch (error) {
+        }
     }
 };
 exports.VisitService = VisitService;
