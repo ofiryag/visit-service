@@ -14,7 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VisitController = void 0;
 const common_1 = require("@nestjs/common");
-const dtos_1 = require("../contracts/dtos");
+const schemas_1 = require("../contracts/schemas");
 const visit_service_interface_1 = require("../services/visit.service.interface");
 const consts_1 = require("../utilities/consts");
 const helpers_1 = require("../utilities/helpers");
@@ -31,7 +31,7 @@ let VisitController = class VisitController {
             limit,
             organization_id
         };
-        const zodResult = dtos_1.getVisitRequestSchema.safeParse(request);
+        const zodResult = schemas_1.getVisitRequestSchema.safeParse(request);
         if (!zodResult.success)
             throw new common_1.HttpException(zodResult.error, common_1.HttpStatus.BAD_REQUEST);
         return await this.visitService.getVisits(request);
@@ -44,7 +44,10 @@ let VisitController = class VisitController {
             organization_id,
             visits
         };
-        return await this.visitService.bulkInsertVisits(request);
+        const zodResult = schemas_1.bulkVisitRequestSchema.safeParse(request);
+        if (!zodResult.success)
+            throw new common_1.HttpException(zodResult.error, common_1.HttpStatus.BAD_REQUEST);
+        return await this.visitService.bulkInsertVisits(zodResult.data);
     }
 };
 exports.VisitController = VisitController;
