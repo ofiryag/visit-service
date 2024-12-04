@@ -5,6 +5,7 @@ import { IVisitRepository } from "src/repositories/visit.repository.interface";
 import { InsertManyResult } from "mongodb";
 import { isValidVisit } from "src/utilities/helpers";
 import { bulkStatusCalculator } from "src/utilities/bulk";
+import { BULK_RESULT_STATUSES } from "src/utilities/consts";
 
 @Injectable()
 export class VisitService implements IVisitService {
@@ -48,7 +49,7 @@ export class VisitService implements IVisitService {
             return bulkResult;
         } catch (error) {
             console.error('failed to insert visits, error:', error);
-            bulkResult.status = 'error';
+            bulkResult.status = BULK_RESULT_STATUSES.ERROR;
             bulkResult.failures.push(...bulkResult.successes);
             bulkResult.successes = [];
             throw new HttpException(bulkResult, HttpStatus.INTERNAL_SERVER_ERROR);
