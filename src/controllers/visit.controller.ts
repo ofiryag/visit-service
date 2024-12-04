@@ -4,6 +4,7 @@ import { InsertManyResult,Document } from "mongodb";
 import { BulkVisitRequestDto, GetVisitRequestDto } from "src/contracts/dtos";
 import { bulkVisitRequestSchema, getVisitRequestSchema } from "src/contracts/schemas";
 import { IVisitService } from "src/services/visit.service.interface";
+import { transformHttpRequestToBulkVisitRequestDto, transformHttpRequestToGetVisitRequestDto } from "src/transformers/visit.transformer";
 import { API_V1 } from "src/utilities/consts";
 import { extractOrganizationIdFromRequest } from "src/utilities/helpers";
 import { parsePaginationQueryParams } from "src/utilities/pagination";
@@ -20,24 +21,19 @@ export class VisitController {
     */
     @Get()
     async getVisits(@Request() req: HttpRequest){
-        const organization_id = extractOrganizationIdFromRequest(req);
-        const {offset,limit } = parsePaginationQueryParams(req);
-
-        console.log(`trying to get visits for organization_id ${organization_id}`)
-        const request: GetVisitRequestDto = {offset,limit,organization_id};
+        const request = transformHttpRequestToGetVisitRequestDto(req)
+        console.log(`trying to get visits for organization_id ${request.organization_id}`)
 
         const zodResult = getVisitRequestSchema.safeParse(request);
         if(!zodResult.success)
         {
-            console.log(`failed to get visits for organization_id ${organization_id}, error:`, zodResult.error)
-            throw new HttpException(zodResult.error, HttpStatus.BAD_REQUEST);
+            console.error(`failed to get visits for organization_id ${request.organization_id}, error:`, zodResult.error)
+            throw new HttpException({message: 'Invalid request parameters.',errors: zodResult.error.errors}, HttpStatus.BAD_REQUEST);    
         }
-
 
         const result = await this.visitService.getVisits(request);
         console.log(`successfully got visits for organization_id ${request.organization_id}`)
         return result;
-
     }
 
     /**
@@ -48,21 +44,18 @@ export class VisitController {
     */
     @Post()
     async bulkInsertVisits(@Request() req: HttpRequest){
-        const organization_id = extractOrganizationIdFromRequest(req);
-        console.log(`trying to insert visits for organization_id ${organization_id}`)
-
-        const visits = req.body;
-        const request: BulkVisitRequestDto = {organization_id, visits};
+        const request = transformHttpRequestToBulkVisitRequestDto(req)
+        console.log(`trying to insert visits for organization_id ${request.organization_id}`)
 
         const zodResult = bulkVisitRequestSchema.safeParse(request)
         if(!zodResult.success)
         {
-            console.log(`failed to insert visits for organization_id ${organization_id}, error:`, zodResult.error)
-            throw new HttpException(zodResult.error, HttpStatus.BAD_REQUEST);
+            console.error(`failed to insert visits for organization_id ${request.organization_id}, error:`, zodResult.error)
+            throw new HttpException({message: 'Invalid request parameters.',errors: zodResult.error.errors}, HttpStatus.BAD_REQUEST);    
         }
 
         const result = await this.visitService.bulkInsertVisits(zodResult.data) as InsertManyResult<Document>;
-        console.log(`successfully inserted ${result.insertedCount} visits for organization_id ${organization_id}`)
+        console.log(`successfully inserted ${result.insertedCount} visits for organization_id ${request.organization_id}`)
         return result;
     }
 }

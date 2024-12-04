@@ -1,12 +1,19 @@
 import { z } from 'zod';
 import { bulkVisitRequestSchema, getVisitRequestSchema, postVisitRequestSchema } from './schemas';
 
-//ToDO GetVisitResponseDto - docu
-export type GetVisitResponseDto = {
+ /**
+ * Represents a visit response item.
+ */
+ export type GetVisitResponseDto = {
     url: string;
     time: Date;
 }
 
+ /**
+ * Represents a paginated result structure.
+ * 
+ * @template T - The type of the items in the paginated result.
+ */
 export type PaginatedResult<T> = {
     data: T[];          // List of items returned in the current page
     totalCount: number; // Total number of items

@@ -4,7 +4,13 @@ import { isNil} from 'lodash';
 import { TOKEN_ORG_ID_KEY } from "./consts";
 import { Request as HttpRequest } from "express";
 
-export const extractOrganizationIdFromRequest = (req: HttpRequest)=>{
+/**
+* Extracts the organization id from JWT token.
+* @param BulkVisitRequestDto The DTO containing the visit data.
+* @returns Organization id.
+* @throws UnauthorizedRequestException if the provided token was invalid.
+*/
+export const extractOrganizationIdFromRequest = (req: HttpRequest):string =>{
     const token = req.headers["authorization"]?.split(" ").at(1); // Extract token from Authorization header
 
     if (isNil(token)) {
@@ -17,6 +23,6 @@ export const extractOrganizationIdFromRequest = (req: HttpRequest)=>{
       throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED);
     }
 
-    const organizationId = decodedToken[TOKEN_ORG_ID_KEY];
+    const organizationId:string = decodedToken[TOKEN_ORG_ID_KEY];
     return organizationId;
 }

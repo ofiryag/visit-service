@@ -8,8 +8,11 @@ export class MongoDbRepository implements IDbRepository<MongoClient> {
 
   constructor() {}
 
-  // Check if the client is already connected
-  private async isConnected(): Promise<boolean> {
+    /**
+    * Checks if the client is connected.
+    * @returns true if the client is connected, otherwise return false.
+    */
+    private async isConnected(): Promise<boolean> {
     try {
       await this.client.db().command({ ping: 1 });
       return true; 
@@ -18,21 +21,20 @@ export class MongoDbRepository implements IDbRepository<MongoClient> {
     }
   }
 
-  // Connect to db client if it's not connected
-  async connectToDbClient(): Promise<MongoClient> {
+    /**
+    * Connect to db client if it's not connected
+    * @returns MongoClient A mongo db client.
+    */
+    async connectToDbClient(): Promise<MongoClient> {
     if (this.client && await this.isConnected()) {
       return this.client;
     }
-
     this.client = new MongoClient("mongodb://localhost:27017");
-    try {
-      console.log("trying to connect mongodb");
-      await this.client.connect();
-      console.log("successfully connected to mongodb");
-      return this.client;
-    } catch (error) {
-      console.error("failed to connect mongodb, error:", error);
-      throw error;
-    }
+
+    console.log("trying to connect mongodb");
+    await this.client.connect();
+
+    console.log("successfully connected to mongodb");
+    return this.client;
   }
 }

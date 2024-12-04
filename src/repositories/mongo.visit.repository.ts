@@ -22,7 +22,7 @@ export class MongoVisitRepository implements IVisitRepository {
           const result =  documents.at(0);
           return result as PaginatedResult<GetVisitResponseDto>;
         } catch (error) {
-            console.error(`failed to get visits from mongoDB for organization_id ${request.organization_id}, error:`,error )
+            console.error(`failed to get visits from mongoDB for organization_id ${request.organization_id}, error:`, error )
             throw new HttpException(`failed to get visits for organization_id ${request.organization_id}`, HttpStatus.INTERNAL_SERVER_ERROR);
         }
       }
@@ -79,7 +79,7 @@ const buildPaginationStages = (request: GetVisitRequestDto): Document[] => {
           $ifNull: [
             {
               $ceil: {
-                $divide: ["$totalCount", 5]
+                $divide: ["$totalCount", request.limit]
               }
             },
             0
