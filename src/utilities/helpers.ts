@@ -5,16 +5,16 @@ import { TOKEN_ORG_ID_KEY } from "./consts";
 import { Request as HttpRequest } from "express";
 
 export const extractOrganizationIdFromRequest = (req: HttpRequest)=>{
-    const token = req.headers['authorization']?.split(' ')[1]; // Extract token from Authorization header
+    const token = req.headers["authorization"]?.split(" ").at(1); // Extract token from Authorization header
 
-    if (!token) {
-      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    if (isNil(token)) {
+      throw new HttpException("Unauthorized", HttpStatus.UNAUTHORIZED);
     }
 
     const decodedToken = decodeJwt(token);
 
     if (isNil(decodedToken) || isNil(decodedToken[TOKEN_ORG_ID_KEY])) {
-      throw new HttpException('Invalid token or missing custom claim', HttpStatus.UNAUTHORIZED);
+      throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED);
     }
 
     const organizationId = decodedToken[TOKEN_ORG_ID_KEY];

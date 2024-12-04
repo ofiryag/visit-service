@@ -9,7 +9,11 @@ exports.MONGO = {
 };
 exports.API_PARAMS = {
     OFFSET: "offset",
-    LIMIT: "limit"
+    LIMIT: "limit",
+    DEFAULTS: {
+        OFFSET: 0,
+        LIMIT: 100,
+    }
 };
 exports.TOKEN_ORG_ID_KEY = 'custom:organization_id';
 //# sourceMappingURL=consts.js.map

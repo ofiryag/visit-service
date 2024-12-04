@@ -12,12 +12,7 @@ exports.bulkVisitRequestSchema = zod_1.z.object({
 });
 exports.getVisitRequestSchema = zod_1.z.object({
     organization_id: zod_1.z.string(),
-    offset: zod_1.z.number().optional(),
-    limit: zod_1.z.number().optional(),
-}).refine((data) => {
-    return ((data.offset === undefined && data.limit === undefined) ||
-        (data.offset !== undefined && data.limit !== undefined));
-}, {
-    message: 'If offset is provided, limit must also be provided',
+    offset: zod_1.z.number(),
+    limit: zod_1.z.number(),
 });
 //# sourceMappingURL=schemas.js.map

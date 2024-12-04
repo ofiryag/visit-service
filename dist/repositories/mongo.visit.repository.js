@@ -22,35 +22,30 @@ let MongoVisitRepository = class MongoVisitRepository {
     }
     async getVisits(request) {
         try {
-            const dbClient = await this.dbRepository.connectToDatabase();
+            const dbClient = await this.dbRepository.connectToDbClient();
             const orgDb = dbClient.db(`org_${request.organization_id}`);
             const visitsCollection = orgDb.collection(consts_1.MONGO.COLLECTIONS.VISITS);
             const visitAggregation = [];
-            if (request.limit && request.offset)
-                visitAggregation.push(...buildPaginationStages(request));
-            visitAggregation.push({
-                $project: {
-                    _id: 0
-                }
-            });
+            visitAggregation.push(...buildPaginationStages(request));
             const documents = await visitsCollection.aggregate(visitAggregation).toArray();
-            return documents;
+            const result = documents.at(0);
+            return result;
         }
         catch (error) {
-            console.log(`failed to get visits from mongoDB for organization_id ${request.organization_id}, error: ${error}`);
+            console.error(`failed to get visits from mongoDB for organization_id ${request.organization_id}, error:`, error);
             throw new common_1.HttpException(`failed to get visits for organization_id ${request.organization_id}`, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     async bulkInsertVisits(request) {
         try {
-            const dbClient = await this.dbRepository.connectToDatabase();
+            const dbClient = await this.dbRepository.connectToDbClient();
             const orgDb = dbClient.db(`org_${request.organization_id}`);
             const visitsCollection = orgDb.collection(consts_1.MONGO.COLLECTIONS.VISITS);
             const result = await visitsCollection.insertMany(request.visits);
             return result;
         }
         catch (error) {
-            console.log(`failed to insert visits to mongoDB for organization_id ${request.organization_id}, error: ${error}`);
+            console.error(`failed to insert visits to mongoDB for organization_id ${request.organization_id}, error: ${error}`);
             throw new common_1.HttpException(`failed to insert visits for organization_id ${request.organization_id}`, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -64,10 +59,48 @@ exports.MongoVisitRepository = MongoVisitRepository = __decorate([
 const buildPaginationStages = (request) => {
     return [
         {
-            $skip: (request.limit * request.offset)
+            $project: {
+                _id: 0
+            }
         },
         {
-            $limit: request.limit
+            $facet: {
+                data: [
+                    {
+                        $skip: request.limit * request.offset
+                    },
+                    {
+                        $limit: request.limit
+                    }
+                ],
+                totalCount: [
+                    {
+                        $count: "count"
+                    }
+                ]
+            }
+        },
+        {
+            $set: {
+                totalCount: {
+                    $first: "$totalCount.count"
+                }
+            }
+        },
+        {
+            $set: {
+                totalPages: {
+                    $ifNull: [
+                        {
+                            $ceil: {
+                                $divide: ["$totalCount", 5]
+                            }
+                        },
+                        0
+                    ]
+                },
+                totalCount: { $ifNull: ["$totalCount", 0] }
+            }
         }
     ];
 };

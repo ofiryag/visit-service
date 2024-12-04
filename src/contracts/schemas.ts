@@ -12,14 +12,6 @@ export const bulkVisitRequestSchema = z.object({
   
   export const getVisitRequestSchema = z.object({
     organization_id: z.string(),
-    offset: z.number().optional(),
-    limit: z.number().optional(),
-  }).refine((data) => {
-    // If offset is provided, limit must also be provided
-    return (
-      (data.offset === undefined && data.limit === undefined) || 
-      (data.offset !== undefined && data.limit !== undefined)
-    );
-  }, {
-    message: 'If offset is provided, limit must also be provided',
+    offset: z.number(),
+    limit: z.number(),
   });

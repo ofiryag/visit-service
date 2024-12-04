@@ -14,15 +14,30 @@ const common_1 = require("@nestjs/common");
 const mongodb_1 = require("mongodb");
 let MongoDbRepository = class MongoDbRepository {
     constructor() { }
-    async connectToDatabase() {
-        const client = new mongodb_1.MongoClient("mongodb://localhost:27017", {});
+    async isConnected() {
         try {
-            await client.connect();
-            console.log('Connected to MongoDB');
-            return client;
+            await this.client.db().command({ ping: 1 });
+            return true;
         }
         catch (error) {
-            console.error('Error connecting to MongoDB', error);
+            return false;
+        }
+    }
+    async connectToDbClient() {
+        if (this.client && await this.isConnected()) {
+            return this.client;
+        }
+        console.log(process.env.MONGO_URI);
+        this.client = new mongodb_1.MongoClient(process.env.MONGO_URI);
+        try {
+            console.log("trying to connect mongodb");
+            await this.client.connect();
+            console.log("successfully connected to mongodb");
+            return this.client;
+        }
+        catch (error) {
+            console.error("failed to connect mongodb, error:", error);
+            throw error;
         }
     }
 };

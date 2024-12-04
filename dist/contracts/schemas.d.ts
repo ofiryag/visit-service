@@ -34,19 +34,11 @@ export declare const bulkVisitRequestSchema: z.ZodObject<{
     }[];
     organization_id?: string;
 }>;
-export declare const getVisitRequestSchema: z.ZodEffects<z.ZodObject<{
+export declare const getVisitRequestSchema: z.ZodObject<{
     organization_id: z.ZodString;
-    offset: z.ZodOptional<z.ZodNumber>;
-    limit: z.ZodOptional<z.ZodNumber>;
+    offset: z.ZodNumber;
+    limit: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
-    organization_id?: string;
-    offset?: number;
-    limit?: number;
-}, {
-    organization_id?: string;
-    offset?: number;
-    limit?: number;
-}>, {
     organization_id?: string;
     offset?: number;
     limit?: number;

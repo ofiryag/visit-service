@@ -18,36 +18,38 @@ const schemas_1 = require("../contracts/schemas");
 const visit_service_interface_1 = require("../services/visit.service.interface");
 const consts_1 = require("../utilities/consts");
 const helpers_1 = require("../utilities/helpers");
+const pagination_1 = require("../utilities/pagination");
 let VisitController = class VisitController {
     constructor(visitService) {
         this.visitService = visitService;
     }
     async getVisits(req) {
-        const offset = Number(req.query[consts_1.API_PARAMS.OFFSET]);
-        const limit = Number(req.query[consts_1.API_PARAMS.LIMIT]);
         const organization_id = (0, helpers_1.extractOrganizationIdFromRequest)(req);
-        const request = {
-            offset,
-            limit,
-            organization_id
-        };
+        const { offset, limit } = (0, pagination_1.parsePaginationQueryParams)(req);
+        console.log(`trying to get visits for organization id ${organization_id}`);
+        const request = { offset, limit, organization_id };
         const zodResult = schemas_1.getVisitRequestSchema.safeParse(request);
-        if (!zodResult.success)
+        if (!zodResult.success) {
+            console.log(`failed to get visits for organization id ${organization_id}, error:`, zodResult.error);
             throw new common_1.HttpException(zodResult.error, common_1.HttpStatus.BAD_REQUEST);
-        return await this.visitService.getVisits(request);
+        }
+        const result = await this.visitService.getVisits(request);
+        console.log(`successfully got visits for organization id ${request.organization_id}`);
+        return result;
     }
     async bulkInsertVisits(req) {
-        console.log("trying to insert visits");
-        const visits = req.body;
         const organization_id = (0, helpers_1.extractOrganizationIdFromRequest)(req);
-        const request = {
-            organization_id,
-            visits
-        };
+        console.log(`trying to insert visits for organization id ${organization_id}`);
+        const visits = req.body;
+        const request = { organization_id, visits };
         const zodResult = schemas_1.bulkVisitRequestSchema.safeParse(request);
-        if (!zodResult.success)
+        if (!zodResult.success) {
+            console.log(`failed to insert visits for organization id ${organization_id}, error:`, zodResult.error);
             throw new common_1.HttpException(zodResult.error, common_1.HttpStatus.BAD_REQUEST);
-        return await this.visitService.bulkInsertVisits(zodResult.data);
+        }
+        const result = await this.visitService.bulkInsertVisits(zodResult.data);
+        console.log(`successfully inserted ${result.insertedCount} visits for organization id ${organization_id}`);
+        return result;
     }
 };
 exports.VisitController = VisitController;

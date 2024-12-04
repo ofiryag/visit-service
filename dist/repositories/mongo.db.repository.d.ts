@@ -1,6 +1,8 @@
 import { MongoClient } from 'mongodb';
 import { IDbRepository } from './db.repository.interface';
 export declare class MongoDbRepository implements IDbRepository<MongoClient> {
+    private client;
     constructor();
-    connectToDatabase(): Promise<MongoClient>;
+    private isConnected;
+    connectToDbClient(): Promise<MongoClient>;
 }

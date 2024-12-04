@@ -1,5 +1,5 @@
 export interface IDbRepository<T> {
-    connectToDatabase : () => Promise<T>;
+    connectToDbClient : () => Promise<T>;
 }
 
 export const IDbRepository = Symbol('IDbRepository');

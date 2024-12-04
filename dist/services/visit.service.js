@@ -14,35 +14,18 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VisitService = void 0;
 const common_1 = require("@nestjs/common");
-const lodash_1 = require("lodash");
 const visit_repository_interface_1 = require("../repositories/visit.repository.interface");
 let VisitService = class VisitService {
     constructor(visitRepository) {
         this.visitRepository = visitRepository;
     }
     async getVisits(request) {
-        try {
-            console.log(`trying to get visits for organization id ${request.organization_id}`);
-            const visits = await this.visitRepository.getVisits(request);
-            if (visits.length === 0 || (0, lodash_1.isNil)(visits)) {
-                console.log("could not find visits");
-                return visits;
-            }
-            console.log(`successfully got visits for organization id ${request.organization_id}`);
-            return visits;
-        }
-        catch (error) {
-        }
+        const visits = await this.visitRepository.getVisits(request);
+        return visits;
     }
     async bulkInsertVisits(request) {
-        try {
-            console.log(`trying to insert visits for organization id ${request.organization_id}`);
-            const result = await this.visitRepository.bulkInsertVisits(request);
-            console.log(`successfully inserted visits for organization id ${request.organization_id}`);
-            return result;
-        }
-        catch (error) {
-        }
+        const result = await this.visitRepository.bulkInsertVisits(request);
+        return result;
     }
 };
 exports.VisitService = VisitService;
