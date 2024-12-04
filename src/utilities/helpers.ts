@@ -7,7 +7,7 @@ import { Request as HttpRequest } from "express";
 /**
 * Extracts the organization id from JWT token.
 * @param BulkVisitRequestDto The DTO containing the visit data.
-* @returns Organization id.
+* @returns {string} organization_id
 * @throws UnauthorizedRequestException if the provided token was invalid.
 */
 export const extractOrganizationIdFromRequest = (req: HttpRequest):string =>{
