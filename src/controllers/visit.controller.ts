@@ -54,8 +54,9 @@ export class VisitController {
             throw new HttpException({message: 'Invalid request parameters.',errors: zodResult.error.errors}, HttpStatus.BAD_REQUEST);    
         }
 
-        const result = await this.visitService.bulkInsertVisits(zodResult.data) as InsertManyResult<Document>;
-        console.log(`successfully inserted ${result.insertedCount} visits for organization_id ${request.organization_id}`)
+        const result = await this.visitService.bulkInsertVisits(zodResult.data);
+        
+        console.log(`${result.status} to insert visits for organization_id ${request.organization_id}`)
         return result;
     }
 }

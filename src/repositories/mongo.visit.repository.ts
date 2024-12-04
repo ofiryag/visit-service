@@ -26,13 +26,21 @@ export class MongoVisitRepository implements IVisitRepository {
             throw new HttpException(`failed to get visits for organization_id ${request.organization_id}`, HttpStatus.INTERNAL_SERVER_ERROR);
         }
       }
-
+      
+    /**
+    * insert the user's visits to mongodb using insertMany
+    * insertMany is an atomic operation, if an error occur during the insertion of any document within the array, 
+    * the operation will roll back and no documents will be inserted
+    * @param BulkVisitRequestDto The DTO containing the visit data.
+    * @returns {InsertManyResult<Document>} A success object if the visits are successfully created.
+    * @throws {HttpException} if the insertion failed.
+    */
       async bulkInsertVisits(request: BulkVisitRequestDto): Promise<InsertManyResult<Document>> {
         try {
           const dbClient = await this.dbRepository.connectToDbClient()
           const orgDb = dbClient.db(`org_${request.organization_id}`);
           const visitsCollection = orgDb.collection(MONGO.COLLECTIONS.VISITS);
-
+          
           const result = await visitsCollection.insertMany(request.visits);
           return result;
         } catch (error) {

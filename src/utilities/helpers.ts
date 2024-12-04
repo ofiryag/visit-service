@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { decodeJwt } from "src/services/jwt.service";
 import { isNil} from 'lodash';
-import { TOKEN_ORG_ID_KEY } from "./consts";
+import { LLM_WHITELIST, TOKEN_ORG_ID_KEY } from "./consts";
 import { Request as HttpRequest } from "express";
 
 /**
@@ -26,3 +26,10 @@ export const extractOrganizationIdFromRequest = (req: HttpRequest):string =>{
     const organizationId:string = decodedToken[TOKEN_ORG_ID_KEY];
     return organizationId;
 }
+
+/**
+* In order to reduce redundant http requests, the visit should be sent only in case it is include one of the items in the whitelist.
+* @param {number} url The visited url.
+* @return {boolean} true - if url is llm visit, otherwise false
+*/
+export const isValidVisit = (url:string): boolean => LLM_WHITELIST.some(llm => url.toLowerCase().includes(llm.toLowerCase()));

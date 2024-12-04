@@ -16,3 +16,5 @@ export const API_PARAMS = {
 } as const
 
 export const TOKEN_ORG_ID_KEY = 'custom:organization_id';
+
+export const LLM_WHITELIST = ["chatgpt", "openai", "claude", "sonnet", "gemini", "LLM", "AI", "chatbot"];

@@ -1,9 +1,10 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { IVisitService } from "./visit.service.interface";
-import { BulkVisitRequestDto, GetVisitRequestDto, GetVisitResponseDto, PaginatedResult, PostVisitRequestDto } from "src/contracts/dtos";
-import { isNil} from 'lodash';
+import { BulkResult, BulkVisitRequestDto, GetVisitRequestDto, GetVisitResponseDto, PaginatedResult, PostVisitRequestDto } from "src/contracts/dtos";
 import { IVisitRepository } from "src/repositories/visit.repository.interface";
 import { InsertManyResult } from "mongodb";
+import { isValidVisit } from "src/utilities/helpers";
+import { bulkStatusCalculator } from "src/utilities/bulk";
 
 @Injectable()
 export class VisitService implements IVisitService {
@@ -14,8 +15,43 @@ export class VisitService implements IVisitService {
         return visits;
     }
     
-    async bulkInsertVisits (request: BulkVisitRequestDto): Promise<InsertManyResult<Document>>{
-        const result = await this.visitRepository.bulkInsertVisits(request);
-        return result;
+    async bulkInsertVisits (request: BulkVisitRequestDto): Promise<BulkResult<PostVisitRequestDto>>{
+        const {visits} = request;
+
+        let vaildVisitsRequest: BulkVisitRequestDto = {organization_id:request.organization_id};
+        
+        const { successes, failures } = visits.reduce((acc, v) => {
+        if (isValidVisit(v.url)) {
+            acc.successes.push(v);
+        } else {
+            acc.failures.push(v);
+        }
+        return acc;
+        }, { successes: [], failures: [] });
+        
+        const bulkResult: BulkResult<PostVisitRequestDto> = {
+            successes,
+            failures,
+            status: ""
+        }
+
+        //If all of the requests are invalid, no need to send it 
+        if (bulkResult.successes.length === 0){
+                bulkResult.status = bulkStatusCalculator(bulkResult);
+                return bulkResult;
+            } 
+
+        try {
+            vaildVisitsRequest.visits = bulkResult.successes;
+            await this.visitRepository.bulkInsertVisits(vaildVisitsRequest) as InsertManyResult<Document>;
+            bulkResult.status = bulkStatusCalculator(bulkResult);
+            return bulkResult;
+        } catch (error) {
+            console.error('failed to insert visits, error:', error);
+            bulkResult.status = 'error';
+            bulkResult.failures.push(...bulkResult.successes);
+            bulkResult.successes = [];
+            throw new HttpException(bulkResult, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

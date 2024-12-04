@@ -1,7 +1,5 @@
-import { HttpException, HttpStatus } from "@nestjs/common";
 import { Request } from "express";
 import { BulkVisitRequestDto, GetVisitRequestDto } from "src/contracts/dtos";
-import { getVisitRequestSchema } from "src/contracts/schemas";
 import { extractOrganizationIdFromRequest } from "src/utilities/helpers";
 import { parsePaginationQueryParams } from "src/utilities/pagination";
 
