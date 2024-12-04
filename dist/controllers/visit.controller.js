@@ -26,29 +26,29 @@ let VisitController = class VisitController {
     async getVisits(req) {
         const organization_id = (0, helpers_1.extractOrganizationIdFromRequest)(req);
         const { offset, limit } = (0, pagination_1.parsePaginationQueryParams)(req);
-        console.log(`trying to get visits for organization id ${organization_id}`);
+        console.log(`trying to get visits for organization_id ${organization_id}`);
         const request = { offset, limit, organization_id };
         const zodResult = schemas_1.getVisitRequestSchema.safeParse(request);
         if (!zodResult.success) {
-            console.log(`failed to get visits for organization id ${organization_id}, error:`, zodResult.error);
+            console.log(`failed to get visits for organization_id ${organization_id}, error:`, zodResult.error);
             throw new common_1.HttpException(zodResult.error, common_1.HttpStatus.BAD_REQUEST);
         }
         const result = await this.visitService.getVisits(request);
-        console.log(`successfully got visits for organization id ${request.organization_id}`);
+        console.log(`successfully got visits for organization_id ${request.organization_id}`);
         return result;
     }
     async bulkInsertVisits(req) {
         const organization_id = (0, helpers_1.extractOrganizationIdFromRequest)(req);
-        console.log(`trying to insert visits for organization id ${organization_id}`);
+        console.log(`trying to insert visits for organization_id ${organization_id}`);
         const visits = req.body;
         const request = { organization_id, visits };
         const zodResult = schemas_1.bulkVisitRequestSchema.safeParse(request);
         if (!zodResult.success) {
-            console.log(`failed to insert visits for organization id ${organization_id}, error:`, zodResult.error);
+            console.log(`failed to insert visits for organization_id ${organization_id}, error:`, zodResult.error);
             throw new common_1.HttpException(zodResult.error, common_1.HttpStatus.BAD_REQUEST);
         }
         const result = await this.visitService.bulkInsertVisits(zodResult.data);
-        console.log(`successfully inserted ${result.insertedCount} visits for organization id ${organization_id}`);
+        console.log(`successfully inserted ${result.insertedCount} visits for organization_id ${organization_id}`);
         return result;
     }
 };

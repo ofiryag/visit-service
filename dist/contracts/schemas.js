@@ -7,8 +7,8 @@ exports.postVisitRequestSchema = zod_1.z.object({
     time: zod_1.z.coerce.date(),
 });
 exports.bulkVisitRequestSchema = zod_1.z.object({
-    visits: zod_1.z.array(exports.postVisitRequestSchema).min(1, 'At least one visit is required'),
-    organization_id: zod_1.z.string().min(1, 'Organization ID is required'),
+    visits: zod_1.z.array(exports.postVisitRequestSchema).min(1, 'at least one visit is required'),
+    organization_id: zod_1.z.string().min(1, 'organization id is required'),
 });
 exports.getVisitRequestSchema = zod_1.z.object({
     organization_id: zod_1.z.string(),

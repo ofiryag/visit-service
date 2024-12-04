@@ -11,7 +11,7 @@ import { parsePaginationQueryParams } from "src/utilities/pagination";
 @Controller(`${API_V1}/visit`)
 export class VisitController {
     constructor(@Inject(IVisitService) private readonly visitService:IVisitService) {}
-    
+
     /**
     * Fetches the user's visits from db.
     * @param HttpRequest Contains the organization_id and pagination query params - offset and limit.
@@ -23,19 +23,19 @@ export class VisitController {
         const organization_id = extractOrganizationIdFromRequest(req);
         const {offset,limit } = parsePaginationQueryParams(req);
 
-        console.log(`trying to get visits for organization id ${organization_id}`)
+        console.log(`trying to get visits for organization_id ${organization_id}`)
         const request: GetVisitRequestDto = {offset,limit,organization_id};
 
         const zodResult = getVisitRequestSchema.safeParse(request);
         if(!zodResult.success)
         {
-            console.log(`failed to get visits for organization id ${organization_id}, error:`, zodResult.error)
+            console.log(`failed to get visits for organization_id ${organization_id}, error:`, zodResult.error)
             throw new HttpException(zodResult.error, HttpStatus.BAD_REQUEST);
         }
 
 
         const result = await this.visitService.getVisits(request);
-        console.log(`successfully got visits for organization id ${request.organization_id}`)
+        console.log(`successfully got visits for organization_id ${request.organization_id}`)
         return result;
 
     }
@@ -49,7 +49,7 @@ export class VisitController {
     @Post()
     async bulkInsertVisits(@Request() req: HttpRequest){
         const organization_id = extractOrganizationIdFromRequest(req);
-        console.log(`trying to insert visits for organization id ${organization_id}`)
+        console.log(`trying to insert visits for organization_id ${organization_id}`)
 
         const visits = req.body;
         const request: BulkVisitRequestDto = {organization_id, visits};
@@ -57,12 +57,12 @@ export class VisitController {
         const zodResult = bulkVisitRequestSchema.safeParse(request)
         if(!zodResult.success)
         {
-            console.log(`failed to insert visits for organization id ${organization_id}, error:`, zodResult.error)
+            console.log(`failed to insert visits for organization_id ${organization_id}, error:`, zodResult.error)
             throw new HttpException(zodResult.error, HttpStatus.BAD_REQUEST);
         }
 
         const result = await this.visitService.bulkInsertVisits(zodResult.data) as InsertManyResult<Document>;
-        console.log(`successfully inserted ${result.insertedCount} visits for organization id ${organization_id}`)
+        console.log(`successfully inserted ${result.insertedCount} visits for organization_id ${organization_id}`)
         return result;
     }
 }

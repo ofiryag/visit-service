@@ -6,8 +6,8 @@ export const postVisitRequestSchema = z.object({
   });
 
 export const bulkVisitRequestSchema = z.object({
-    visits: z.array(postVisitRequestSchema).min(1, 'At least one visit is required'),
-    organization_id: z.string().min(1, 'Organization ID is required'),
+    visits: z.array(postVisitRequestSchema).min(1, 'at least one visit is required'),
+    organization_id: z.string().min(1, 'organization id is required'),
   });
   
   export const getVisitRequestSchema = z.object({
