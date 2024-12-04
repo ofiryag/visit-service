@@ -3,8 +3,16 @@
 ```bash
 $ docker-compose up --build -d
 ```
-## 2. Compile and run the project
+## 2. Install dependencies
 ```bash
 $ npm install
+```
+## 3. Run the service
+```bash
 $ npm run start
+```
+
+### In order to execute unit tests execute:
+```bash
+$ npm run test
 ```
